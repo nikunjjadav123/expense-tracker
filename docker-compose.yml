@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb+srv://${MONGODB_USER}:${MONGODB_PASS}@cluster0.rdocipt.mongodb.net/${MONGODB_DB}?retryWrites=true&w=majority
+    volumes:
+      - .:/app
