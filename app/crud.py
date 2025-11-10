@@ -1,10 +1,19 @@
 from .db import expenses_collection
 from bson import ObjectId
 from datetime import datetime,timezone
+from fastapi import HTTPException, status
 
 async def create_expense(doc):
-    if not doc.get("date"):
+
+    if doc.get("date") is None:
         doc["date"] = datetime.now(timezone.utc)
+
+    existing = await expenses_collection.find_one({"title": doc["title"]})
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Expense with title '{doc['title']}' already exists today."
+        )
     res = await expenses_collection.insert_one(doc)
     return str(res.inserted_id)
 
