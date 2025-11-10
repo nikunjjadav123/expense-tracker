@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from app.routers import expenses
 import uvicorn
 
-app = FastAPI(title="Expense Tracker (no auth)")
+app = FastAPI(title="Expense Tracker")
 
 app.include_router(expenses.router)
 
