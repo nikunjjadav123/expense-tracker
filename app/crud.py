@@ -39,6 +39,7 @@ async def delete_expense(expense_id):
     res = await expenses_collection.delete_one({"_id": ObjectId(expense_id)})
     return res.deleted_count
 
+
 async def get_summary(query: dict = None):
     if query is None:
         query = {}
@@ -46,7 +47,7 @@ async def get_summary(query: dict = None):
     pipeline = [
         {"$match": query},
         {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}},
-        {"$sort": {"total": -1}}  # highest spending first
+        {"$sort": {"total": -1}}
     ]
 
     cursor = expenses_collection.aggregate(pipeline)

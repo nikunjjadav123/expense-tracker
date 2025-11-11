@@ -3,9 +3,41 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
 from ..models import ExpenseCreate
 from .. import crud
+import traceback
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
 
+@router.get("/summary")
+async def get_expense_summary(
+    from_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    to_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
+):
+    try:
+        query = {}
+        date_filter = {}
+
+        if from_date:
+            from_dt = datetime.strptime(from_date, "%Y-%m-%d")
+            date_filter["$gte"] = from_dt
+
+        if to_date:
+            to_dt = datetime.strptime(to_date, "%Y-%m-%d")
+            date_filter["$lte"] = to_dt
+
+        if date_filter:
+            query["date"] = date_filter
+            
+        summary = await crud.get_summary(query)
+       
+        if not summary:
+            return {"message": "No data found", "query_used": query}
+
+        return {"categories": summary, "grand_total": sum(s["total"] for s in summary)}
+
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @router.post("/", status_code=201)
 async def create_expense(payload: ExpenseCreate):
     doc = payload.dict()
@@ -59,35 +91,4 @@ async def delete_expense(expense_id: str):
     return {}
 
 
-@router.get("/summary")
-async def get_expense_summary(
-    from_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
-    to_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
-):
-    try:
-        # Build date filter if provided
-        query = {}
-        date_filter = {}
 
-        if from_date:
-            try:
-                from_dt = datetime.strptime(from_date, "%Y-%m-%d")
-                date_filter["$gte"] = from_dt
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid from_date format (use YYYY-MM-DD).")
-
-        if to_date:
-            try:
-                to_dt = datetime.strptime(to_date, "%Y-%m-%d")
-                date_filter["$lte"] = to_dt
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid to_date format (use YYYY-MM-DD).")
-
-        if date_filter:
-            query["date"] = date_filter
-
-        summary = await crud.get_summary(query)
-        return summary
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
