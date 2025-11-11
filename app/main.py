@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from app.routers import expenses
-import uvicorn
 
 app = FastAPI(title="Expense Tracker App")
 
