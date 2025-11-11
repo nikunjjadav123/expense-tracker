@@ -57,3 +57,37 @@ async def delete_expense(expense_id: str):
     if deleted == 0:
         raise HTTPException(404, "Not found")
     return {}
+
+
+@router.get("/summary")
+async def get_expense_summary(
+    from_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    to_date: Optional[str] = Query(None, description="End date (YYYY-MM-DD)")
+):
+    try:
+        # Build date filter if provided
+        query = {}
+        date_filter = {}
+
+        if from_date:
+            try:
+                from_dt = datetime.strptime(from_date, "%Y-%m-%d")
+                date_filter["$gte"] = from_dt
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid from_date format (use YYYY-MM-DD).")
+
+        if to_date:
+            try:
+                to_dt = datetime.strptime(to_date, "%Y-%m-%d")
+                date_filter["$lte"] = to_dt
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid to_date format (use YYYY-MM-DD).")
+
+        if date_filter:
+            query["date"] = date_filter
+
+        summary = await crud.get_summary(query)
+        return summary
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
