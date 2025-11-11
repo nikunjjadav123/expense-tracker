@@ -1,4 +1,3 @@
-from unicodedata import category
 from .db import expenses_collection
 from bson import ObjectId
 from datetime import datetime, timezone
