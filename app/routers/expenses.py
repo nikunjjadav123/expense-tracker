@@ -42,7 +42,7 @@ async def get_expense_summary(
 async def create_expense(payload: ExpenseCreate):
     doc = payload.dict()
     new_id = await crud.create_expense(doc)
-    return {"id": new_id}
+    return new_id
 
 @router.get("/")
 async def list_expenses(

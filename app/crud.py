@@ -16,7 +16,8 @@ async def create_expense(doc):
             detail=f"Expense with title '{doc['title']}' already exists today."
         )
     res = await expenses_collection.insert_one(doc)
-    return str(res.inserted_id)
+    doc["_id"] = str(res.inserted_id)
+    return doc
 
 async def get_expense(expense_id):
     doc = await expenses_collection.find_one({"_id": ObjectId(expense_id)})
