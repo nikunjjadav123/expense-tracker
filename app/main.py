@@ -6,10 +6,12 @@ app = FastAPI(title="Expense Tracker App")
 
 app.include_router(expenses.router)
 
+
 # simple root
 @app.get("/")
 async def root():
     return {"message": "Expense Tracker - no login required"}
+
 
 # # run with uvicorn in Docker
 # if __name__ == "__main__":
