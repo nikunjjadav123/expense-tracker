@@ -1,3 +1,4 @@
+from unicodedata import category
 from .db import expenses_collection
 from bson import ObjectId
 from datetime import datetime,timezone
@@ -23,8 +24,11 @@ async def get_expense(expense_id):
         doc["_id"] = str(doc["_id"])
     return doc
 
-async def list_expenses(limit=10):
-    cursor = expenses_collection.find().sort("date", -1).limit(limit)
+async def list_expenses(query: dict = None,limit=10):
+    if query is None:
+        query = {}
+        
+    cursor = expenses_collection.find(query).sort("date", -1).limit(limit)
     docs = []
     async for d in cursor:
         d["_id"] = str(d["_id"])
