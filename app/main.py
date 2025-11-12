@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Expense Tracker App")
 
-app.include_router(expenses.router)
 
 origins = [
     "http://localhost:5173",
@@ -19,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(expenses.router)
 
 
 # simple root
