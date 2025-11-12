@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://expense-tracker-o1dq.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const getExpenses = async () => {
   const res = await axios.get(`${API_URL}/expenses/`);
