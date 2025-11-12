@@ -9,6 +9,7 @@ app.include_router(expenses.router)
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://expense-tracker-frontside.onrender.com",
 ]
 
 app.add_middleware(
